@@ -118,3 +118,6 @@ dist
 
 # IDE files
 .idea
+
+# outputs
+certbot
