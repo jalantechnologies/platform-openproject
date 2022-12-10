@@ -23,8 +23,6 @@ services:
   openproject:
     image: openproject/community:12
     container_name: openprojectapp
-    depends_on:
-      - webserver
     environment:
       OPENPROJECT_HOST__NAME: "openproject.platform.jalantechnologies.com"
       OPENPROJECT_SECRET_KEY_BASE: "secret"
@@ -34,7 +32,6 @@ services:
     ports:
       - "8080:80"
     networks:
-      - project_private_network
       - project_public_network
 
 volumes:
@@ -44,4 +41,3 @@ volumes:
 networks:
   project_public_network:
     external: true
-  project_private_network:
