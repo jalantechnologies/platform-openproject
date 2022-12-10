@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+
+  webserver:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+    networks:
+      - project_public_network
+
+  openproject:
+    image: openproject/community:12
+    container_name: openprojectapp
+    depends_on:
+      - webserver
+    environment:
+      OPENPROJECT_HOST__NAME: "openproject.platform.jalantechnologies.com"
+      OPENPROJECT_SECRET_KEY_BASE: "secret"
+    volumes:
+      - openproject_data:/var/openproject/pgdata
+      - openproject_assets:/var/openproject/assets
+    ports:
+      - "8080:80"
+    networks:
+      - project_private_network
+      - project_public_network
+
+volumes:
+  openproject_data:
+  openproject_assets:
+
+networks:
+  project_public_network:
+    external: true
+  project_private_network:
